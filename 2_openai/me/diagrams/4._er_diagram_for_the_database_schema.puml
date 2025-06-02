@@ -1,0 +1,45 @@
+
+```plantuml
+@startuml CarSharingApp_ERDiagram
+
+entity "User" {
+  *userID: int
+  --
+  username: varchar
+  password: varchar
+}
+
+entity "Car" {
+  *carID: int
+  --
+  ownerID: int
+  make: varchar
+  model: varchar
+  year: int
+}
+
+entity "Booking" {
+  *bookingID: int
+  --
+  carID: int
+  userID: int
+  startDate: date
+  endDate: date
+}
+
+entity "Review" {
+  *reviewID: int
+  --
+  bookingID: int
+  rating: int
+  comment: text
+}
+
+User ||--o{ Booking : "makes"
+Car ||--o{ Booking : "is booked"
+Booking ||--o{ Review : "has"
+
+@enduml
+```
+
+This ER diagram outlines the database schema, showing how Users, Cars, Bookings, and Reviews are related to each other.

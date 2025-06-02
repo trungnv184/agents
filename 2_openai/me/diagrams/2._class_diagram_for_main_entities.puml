@@ -1,0 +1,48 @@
+
+```plantuml
+@startuml CarSharingApp_ClassDiagram
+
+class User {
+  +userID: int
+  +username: String
+  +password: String
+  +register()
+  +login()
+}
+
+class Car {
+  +carID: int
+  +ownerID: int
+  +make: String
+  +model: String
+  +year: int
+  +listCar()
+  +updateCarDetails()
+}
+
+class Booking {
+  +bookingID: int
+  +carID: int
+  +userID: int
+  +startDate: Date
+  +endDate: Date
+  +bookCar()
+  +cancelBooking()
+}
+
+class Review {
+  +reviewID: int
+  +bookingID: int
+  +rating: int
+  +comment: String
+  +submitReview()
+}
+
+User "1" -- "*" Booking : makes >
+Car "1" -- "*" Booking : is booked >
+Booking "1" -- "1" Review : has >
+
+@enduml
+```
+
+This class diagram represents the main entities: User, Car, Booking, and Review, including their attributes and methods.

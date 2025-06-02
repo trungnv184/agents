@@ -1,0 +1,35 @@
+
+```plantuml
+@startuml CarSharingApp_BookingFlow
+
+actor User as user
+participant "Search Interface" as search
+database "Car Database" as db
+participant "Booking System" as bookingSystem
+participant "Payment Gateway" as payment
+
+user -> search : search(query)
+search -> db : fetch available cars
+db -> search : list of cars
+search -> user : display cars
+
+user -> bookingSystem : select car(carID)
+bookingSystem -> db : check availability(carID)
+db --> bookingSystem : isAvailable
+
+group if car is available
+    bookingSystem --> user : show booking details
+    user -> bookingSystem : confirm booking(details)
+    bookingSystem -> payment : initiate payment(info)
+    payment -> bookingSystem : payment confirmed
+    bookingSystem -> db : reserve car(carID)
+    db --> bookingSystem : booking confirmed
+    bookingSystem --> user : booking success
+else car not available
+    bookingSystem --> user : car not available
+end
+
+@enduml
+```
+
+This sequence diagram illustrates the steps a user goes through when booking a car, including searching, selecting, and confirming the booking.
