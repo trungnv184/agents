@@ -1,35 +1,38 @@
 
 ```plantuml
-@startuml CarSharingApp_BookingFlow
-
+@startuml
 actor User as user
-participant "Search Interface" as search
-database "Car Database" as db
-participant "Booking System" as bookingSystem
-participant "Payment Gateway" as payment
+participant "Booking Service" as bookingService
+participant "Payment Service" as paymentService
+participant "Notification Service" as notificationService
+database "Database" as db
 
-user -> search : search(query)
-search -> db : fetch available cars
-db -> search : list of cars
-search -> user : display cars
+user -> bookingService: selectVehicle(vehicleId, startTime, endTime)
+activate bookingService
+bookingService -> db: createBooking(userId, vehicleId, startTime, endTime)
+activate db
+db --> bookingService: bookingDetails
+deactivate db
 
-user -> bookingSystem : select car(carID)
-bookingSystem -> db : check availability(carID)
-db --> bookingSystem : isAvailable
+bookingService --> user: bookingConfirmation
+deactivate bookingService
 
-group if car is available
-    bookingSystem --> user : show booking details
-    user -> bookingSystem : confirm booking(details)
-    bookingSystem -> payment : initiate payment(info)
-    payment -> bookingSystem : payment confirmed
-    bookingSystem -> db : reserve car(carID)
-    db --> bookingSystem : booking confirmed
-    bookingSystem --> user : booking success
-else car not available
-    bookingSystem --> user : car not available
-end
+user -> paymentService: pay(bookingId, paymentDetails)
+activate paymentService
+paymentService -> db: updatePaymentStatus(bookingId, "completed")
+activate db
+db --> paymentService: paymentConfirmation
+deactivate db
+
+paymentService --> user: paymentConfirmation
+deactivate paymentService
+
+paymentService -> notificationService: sendConfirmation(bookingId)
+activate notificationService
+notificationService -> user: bookingAndPaymentConfirmation
+deactivate notificationService
 
 @enduml
 ```
 
-This sequence diagram illustrates the steps a user goes through when booking a car, including searching, selecting, and confirming the booking.
+This diagram displays the sequence of interactions for booking a vehicle, including payment and confirmation steps.

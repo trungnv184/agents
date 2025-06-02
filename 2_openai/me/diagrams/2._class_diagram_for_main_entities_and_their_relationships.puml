@@ -1,0 +1,33 @@
+
+```plantuml
+@startuml Car_Sharing_App_Class_Diagram
+
+class User {
+  -userId: int
+  -name: String
+  -email: String
+  -passwordHash: String
+  +register(email: String, password: String): User
+  +login(email: String, password: String): bool
+}
+
+class Car {
+  -carId: int
+  -model: String
+  -licenseNumber: String
+  -status: String
+}
+
+class Booking {
+  -bookingId: int
+  -userId: int
+  -carId: int
+  -bookingTime: DateTime
+  -returnTime: DateTime
+}
+
+User "1" -- "0..*" Booking : makes >
+Booking "0..*" -- "1" Car : involves >
+
+@enduml
+```

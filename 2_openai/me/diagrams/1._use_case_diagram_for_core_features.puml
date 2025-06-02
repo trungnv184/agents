@@ -1,24 +1,29 @@
 
 ```plantuml
-@startuml CarSharingApp_UseCase
+@startuml
 left to right direction
 skinparam packageStyle rectangle
 
 actor "User" as user
-actor "Car Owner" as owner
-
-rectangle CarSharingApp {
-  user --> (Search for Cars)
-  user --> (Book a Car)
-  user --> (Cancel Booking)
-  user --> (Review Car)
-  owner --> (List a Car)
-  owner --> (Manage Bookings)
-  (Search for Cars) .> (Book a Car) : extends
-  (Manage Bookings) .> (Cancel Booking) : extends
+rectangle "Car Sharing App" {
+  usecase "Register / Login" as UC1
+  usecase "Choose Vehicle" as UC2
+  usecase "Book Vehicle" as UC3
+  usecase "Cancel Booking" as UC4
+  usecase "Pay for Booking" as UC5
+  usecase "View Booking History" as UC6
+  usecase "Submit Feedback" as UC7
 }
+
+user --> UC1
+user --> UC2
+user --> UC3
+user --> UC4
+user --> UC5
+user --> UC6
+user --> UC7
 
 @enduml
 ```
 
-This diagram shows the core user interactions with the car sharing app, including both "User" and "Car Owner" actors and their use cases.
+This diagram showcases the interactions between the user and the system's core functionalities.

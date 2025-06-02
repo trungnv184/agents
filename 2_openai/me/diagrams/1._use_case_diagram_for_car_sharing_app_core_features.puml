@@ -1,0 +1,28 @@
+
+```plantuml
+@startuml Car_Sharing_App_Use_Case_Diagram
+
+left to right direction
+actor "User" as user
+actor "Admin" as admin
+
+rectangle "Car Sharing App" {
+  usecase "Register / Login" as UC1
+  usecase "Select Car" as UC2
+  usecase "Book Car" as UC3
+  usecase "Cancel Booking" as UC4
+  usecase "View Booking History" as UC5
+  usecase "Administer Cars" as UC6
+  usecase "Administer Users" as UC7
+
+  user --> UC1
+  user --> UC2
+  user --> UC3
+  user --> UC4
+  user --> UC5
+  admin --> UC6
+  admin --> UC7
+}
+
+@enduml
+```

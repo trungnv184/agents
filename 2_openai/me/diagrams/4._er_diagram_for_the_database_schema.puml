@@ -1,45 +1,48 @@
 
 ```plantuml
-@startuml CarSharingApp_ERDiagram
-
+@startuml
 entity "User" {
-  *userID: int
+  *id : int
   --
-  username: varchar
-  password: varchar
+  *name : varchar
+  *email : varchar
+  *password : varchar
 }
 
-entity "Car" {
-  *carID: int
+entity "Vehicle" {
+  *license_number : varchar
   --
-  ownerID: int
-  make: varchar
-  model: varchar
-  year: int
+  *make : varchar
+  *model : varchar
+  *year : int
 }
 
 entity "Booking" {
-  *bookingID: int
+  *id : int
   --
-  carID: int
-  userID: int
-  startDate: date
-  endDate: date
+  *user_id : int
+  *vehicle_license_number : varchar
+  *start_time : datetime
+  *end_time : datetime
+  *cost : float
 }
 
-entity "Review" {
-  *reviewID: int
+entity "Payment" {
+  *id : int
   --
-  bookingID: int
-  rating: int
-  comment: text
+  *booking_id : int
+  *amount : float
+  *payment_date : datetime
+  *payment_method : varchar
 }
 
-User ||--o{ Booking : "makes"
-Car ||--o{ Booking : "is booked"
-Booking ||--o{ Review : "has"
+User ||--o{ Booking : "has"
+Vehicle ||--o{ Booking : "is booked in"
+Booking ||--|{ Payment : "has"
 
 @enduml
 ```
 
-This ER diagram outlines the database schema, showing how Users, Cars, Bookings, and Reviews are related to each other.
+This ER diagram outlines the database schema for storing users, vehicles, bookings, and payments.
+
+Each piece of PlantUML code is designed to be pasted into a PlantUML editor or tool that supports PlantUML syntax to visualize the diagrams.
