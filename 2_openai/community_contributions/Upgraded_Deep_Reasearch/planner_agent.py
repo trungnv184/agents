@@ -14,6 +14,7 @@ that best answer the refined question.
 Return a WebSearchPlan as before.
 """
 
+
 class WebSearchItem(BaseModel):
     reason: str
     "Your reasoning for why this search is important to the query."
@@ -21,9 +22,11 @@ class WebSearchItem(BaseModel):
     query: str
     "The search term to use for the web search."
 
+
 class WebSearchPlan(BaseModel):
     searches: list[WebSearchItem]
     """A list of web searches to perform to best answer the query."""
+
 
 planner_agent = Agent(
     name="PlannerAgent",

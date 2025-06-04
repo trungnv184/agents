@@ -9,7 +9,7 @@ from engineering_team.crew import EngineeringTeam
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 # Create output directory if it doesn't exist
-os.makedirs('output', exist_ok=True)
+os.makedirs("output", exist_ok=True)
 
 requirements = """
 A simple account management system for a trading simulation platform.
@@ -32,9 +32,9 @@ def run():
     Run the research crew.
     """
     inputs = {
-        'requirements': requirements,
-        'module_name': module_name,
-        'class_name': class_name
+        "requirements": requirements,
+        "module_name": module_name,
+        "class_name": class_name,
     }
 
     # Create and run the crew

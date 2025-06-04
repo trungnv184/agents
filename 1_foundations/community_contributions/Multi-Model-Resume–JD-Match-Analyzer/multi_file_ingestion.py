@@ -3,9 +3,8 @@ from langchain.document_loaders import (
     TextLoader,
     PyPDFLoader,
     UnstructuredWordDocumentLoader,
-    UnstructuredFileLoader
+    UnstructuredFileLoader,
 )
-
 
 
 def load_and_split_resume(file_path: str):
@@ -39,6 +38,5 @@ def load_and_split_resume(file_path: str):
     # Load the file as LangChain documents
     documents = loader.load()
 
-   
     return documents
     # return [doc.page_content for doc in split_docs]

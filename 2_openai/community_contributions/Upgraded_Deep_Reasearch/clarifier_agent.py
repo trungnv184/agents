@@ -4,8 +4,10 @@ from typing import List
 from pydantic import BaseModel
 from agents import Agent
 
+
 class ClarificationData(BaseModel):
     questions: List[str]
+
 
 CLARIFY_INSTRUCTIONS = """
 You are a Research Clarifier. Given a user’s research query, generate exactly 3 clarifying questions 

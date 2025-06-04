@@ -1,5 +1,6 @@
 # accounts.py
 
+
 class Account:
     def __init__(self, username: str, initial_deposit: float):
         """
@@ -60,7 +61,9 @@ class Account:
             self.holdings[symbol] += quantity
         else:
             self.holdings[symbol] = quantity
-        self.transactions.append(f"Bought: {quantity} shares of {symbol} at ${share_price:.2f} each")
+        self.transactions.append(
+            f"Bought: {quantity} shares of {symbol} at ${share_price:.2f} each"
+        )
 
     def sell_shares(self, symbol: str, quantity: int) -> None:
         """
@@ -82,7 +85,9 @@ class Account:
         if self.holdings[symbol] == 0:
             del self.holdings[symbol]  # Remove symbol if no shares are left
         self.balance += total_sale_value
-        self.transactions.append(f"Sold: {quantity} shares of {symbol} at ${share_price:.2f} each")
+        self.transactions.append(
+            f"Sold: {quantity} shares of {symbol} at ${share_price:.2f} each"
+        )
 
     def portfolio_value(self) -> float:
         """
@@ -128,8 +133,8 @@ def get_share_price(symbol: str) -> float:
     :return: The share price.
     """
     mock_prices = {
-        'AAPL': 150.00,  # Apple
-        'TSLA': 700.00,  # Tesla
-        'GOOGL': 2800.00  # Google
+        "AAPL": 150.00,  # Apple
+        "TSLA": 700.00,  # Tesla
+        "GOOGL": 2800.00,  # Google
     }
     return mock_prices.get(symbol, 0.0)  # Return 0.0 for unknown symbols

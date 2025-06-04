@@ -13,15 +13,18 @@ from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("push_server")
 
+
 class PushModelArgs(BaseModel):
     message: str = Field(description="A brief message to push")
 
+
 @mcp.tool()
 def push(args: PushModelArgs):
-    """ Send a push notification with this brief message """
+    """Send a push notification with this brief message"""
     print(f"Push: {args.message}")
     payload = {"user": pushover_user, "token": pushover_token, "message": args.message}
     requests.post(pushover_url, data=payload)
 
+
 if __name__ == "__main__":
-    mcp.run(transport='stdio')
+    mcp.run(transport="stdio")

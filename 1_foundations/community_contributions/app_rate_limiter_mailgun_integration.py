@@ -18,28 +18,31 @@ logger.setLevel(logging.DEBUG)
 
 load_dotenv(override=True)
 
+
 class RateLimiter:
     def __init__(self, max_requests=5, time_window=5):
         # max_requests per time_window seconds
         self.max_requests = max_requests
         self.time_window = time_window  # in seconds
         self.request_history = defaultdict(list)
-        
+
     def is_rate_limited(self, user_id):
         current_time = time.time()
         # Remove old requests
         self.request_history[user_id] = [
-            timestamp for timestamp in self.request_history[user_id]
+            timestamp
+            for timestamp in self.request_history[user_id]
             if current_time - timestamp < self.time_window
         ]
-        
+
         # Check if user has exceeded the limit
         if len(self.request_history[user_id]) >= self.max_requests:
             return True
-        
+
         # Add current request
         self.request_history[user_id].append(current_time)
         return False
+
 
 def push(text):
     requests.post(
@@ -48,26 +51,25 @@ def push(text):
             "token": os.getenv("PUSHOVER_TOKEN"),
             "user": os.getenv("PUSHOVER_USER"),
             "message": text,
-        }
+        },
     )
 
+
 def send_email(from_email, name, notes):
-    auth = base64.b64encode(f'api:{os.getenv("MAILGUN_API_KEY")}'.encode()).decode()
-    
+    auth = base64.b64encode(f"api:{os.getenv('MAILGUN_API_KEY')}".encode()).decode()
+
     response = requests.post(
-        f'https://api.mailgun.net/v3/{os.getenv("MAILGUN_DOMAIN")}/messages',
-        headers={
-            'Authorization': f'Basic {auth}'
-        },
+        f"https://api.mailgun.net/v3/{os.getenv('MAILGUN_DOMAIN')}/messages",
+        headers={"Authorization": f"Basic {auth}"},
         data={
-            'from': f'Website Contact <mailgun@{os.getenv("MAILGUN_DOMAIN")}>',
-            'to': os.getenv("MAILGUN_RECIPIENT"),
-            'subject': f'New message from {from_email}',
-            'text': f'Name: {name}\nEmail: {from_email}\nNotes: {notes}',
-            'h:Reply-To': from_email
-        }
+            "from": f"Website Contact <mailgun@{os.getenv('MAILGUN_DOMAIN')}>",
+            "to": os.getenv("MAILGUN_RECIPIENT"),
+            "subject": f"New message from {from_email}",
+            "text": f"Name: {name}\nEmail: {from_email}\nNotes: {notes}",
+            "h:Reply-To": from_email,
+        },
     )
-    
+
     return response.status_code == 200
 
 
@@ -77,9 +79,11 @@ def record_user_details(email, name="Name not provided", notes="not provided"):
     email_sent = send_email(email, name, notes)
     return {"recorded": "ok", "email_sent": email_sent}
 
+
 def record_unknown_question(question):
     push(f"Recording {question}")
     return {"recorded": "ok"}
+
 
 record_user_details_json = {
     "name": "record_user_details",
@@ -89,21 +93,20 @@ record_user_details_json = {
         "properties": {
             "email": {
                 "type": "string",
-                "description": "The email address of this user"
+                "description": "The email address of this user",
             },
             "name": {
                 "type": "string",
-                "description": "The user's name, if they provided it"
-            }
-            ,
+                "description": "The user's name, if they provided it",
+            },
             "notes": {
                 "type": "string",
-                "description": "Any additional information about the conversation that's worth recording to give context"
-            }
+                "description": "Any additional information about the conversation that's worth recording to give context",
+            },
         },
         "required": ["email"],
-        "additionalProperties": False
-    }
+        "additionalProperties": False,
+    },
 }
 
 record_unknown_question_json = {
@@ -114,24 +117,30 @@ record_unknown_question_json = {
         "properties": {
             "question": {
                 "type": "string",
-                "description": "The question that couldn't be answered"
+                "description": "The question that couldn't be answered",
             },
         },
         "required": ["question"],
-        "additionalProperties": False
-    }
+        "additionalProperties": False,
+    },
 }
 
-tools = [{"type": "function", "function": record_user_details_json},
-        {"type": "function", "function": record_unknown_question_json}]
+tools = [
+    {"type": "function", "function": record_user_details_json},
+    {"type": "function", "function": record_unknown_question_json},
+]
 
 
 class Me:
-
     def __init__(self):
-        self.openai = OpenAI(api_key=os.getenv("GOOGLE_API_KEY"), base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+        self.openai = OpenAI(
+            api_key=os.getenv("GOOGLE_API_KEY"),
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        )
         self.name = "Sagarnil Das"
-        self.rate_limiter = RateLimiter(max_requests=5, time_window=60)  # 5 messages per minute
+        self.rate_limiter = RateLimiter(
+            max_requests=5, time_window=60
+        )  # 5 messages per minute
         reader = PdfReader("me/linkedin.pdf")
         self.linkedin = ""
         for page in reader.pages:
@@ -141,7 +150,6 @@ class Me:
         with open("me/summary.txt", "r", encoding="utf-8") as f:
             self.summary = f.read()
 
-
     def handle_tool_call(self, tool_calls):
         results = []
         for tool_call in tool_calls:
@@ -150,9 +158,15 @@ class Me:
             print(f"Tool called: {tool_name}", flush=True)
             tool = globals().get(tool_name)
             result = tool(**arguments) if tool else {}
-            results.append({"role": "tool","content": json.dumps(result),"tool_call_id": tool_call.id})
+            results.append(
+                {
+                    "role": "tool",
+                    "content": json.dumps(result),
+                    "tool_call_id": tool_call.id,
+                }
+            )
         return results
-    
+
     def system_prompt(self):
         system_prompt = f"You are acting as {self.name}. You are answering questions on {self.name}'s website, \
 particularly questions related to {self.name}'s career, background, skills and experience. \
@@ -167,7 +181,7 @@ in which they provide their email, then give a summary of the conversation so fa
         system_prompt += f"\n\n## Summary:\n{self.summary}\n\n## LinkedIn Profile:\n{self.linkedin}\n\n"
         system_prompt += f"With this context, please chat with the user, always staying in character as {self.name}."
         return system_prompt
-    
+
     def chat(self, message, history):
         # Get the client IP from Gradio's request context
         try:
@@ -177,7 +191,7 @@ in which they provide their email, then give a summary of the conversation so fa
             forwarded_for = request.headers.get("X-Forwarded-For")
             # Check for Cf-Connecting-IP header (Cloudflare)
             cloudflare_ip = request.headers.get("Cf-Connecting-IP")
-            
+
             if forwarded_for:
                 # X-Forwarded-For contains a comma-separated list of IPs, the first one is the client
                 user_id = forwarded_for.split(",")[0].strip()
@@ -192,7 +206,7 @@ in which they provide their email, then give a summary of the conversation so fa
         logger.debug(f"User ID: {user_id}")
         if self.rate_limiter.is_rate_limited(user_id):
             return "You're sending messages too quickly. Please wait a moment before sending another message."
-        
+
         messages = [{"role": "system", "content": self.system_prompt()}]
 
         # Check if history is a list of dicts (Gradio "messages" format)
@@ -209,9 +223,7 @@ in which they provide their email, then give a summary of the conversation so fa
         done = False
         while not done:
             response = self.openai.chat.completions.create(
-                model="gemini-2.0-flash",
-                messages=messages,
-                tools=tools
+                model="gemini-2.0-flash", messages=messages, tools=tools
             )
             if response.choices[0].finish_reason == "tool_calls":
                 tool_calls = response.choices[0].message.tool_calls
@@ -223,9 +235,7 @@ in which they provide their email, then give a summary of the conversation so fa
 
         return response.choices[0].message.content
 
-        
 
 if __name__ == "__main__":
     me = Me()
     gr.ChatInterface(me.chat, type="messages").launch()
-    

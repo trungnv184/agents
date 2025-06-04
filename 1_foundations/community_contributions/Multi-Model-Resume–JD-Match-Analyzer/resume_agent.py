@@ -23,7 +23,8 @@ st.set_page_config(page_title="LLM Resume–JD Fit", layout="wide")
 st.title("🧠 Multi-Model Resume–JD Match Analyzer")
 
 # Inject custom CSS to reduce white space
-st.markdown("""
+st.markdown(
+    """
     <style>
         .block-container {
             padding-top: 3rem; /* instead of 1rem */
@@ -44,17 +45,22 @@ st.markdown("""
             margin-top: 1rem; /* Add extra top margin here if needed */
         }
     </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # File upload
 resume_file = st.file_uploader("📄 Upload Resume (any file type)", type=None)
 jd_file = st.file_uploader("📝 Upload Job Description (any file type)", type=None)
 
+
 # Function to extract text from uploaded files
 def extract_text(file):
     if file.name.endswith(".pdf"):
         with pdfplumber.open(file) as pdf:
-            return "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
+            return "\n".join(
+                [page.extract_text() for page in pdf.pages if page.extract_text()]
+            )
     else:
         return StringIO(file.read().decode("utf-8")).read()
 
@@ -69,17 +75,20 @@ Resume:
 {resume_text}
 
 Respond with only the candidate's full name.
-""" 
+"""
     try:
         response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a professional resume evaluator."},
-                {"role": "user", "content": prompt}
-            ]
+                {
+                    "role": "system",
+                    "content": "You are a professional resume evaluator.",
+                },
+                {"role": "user", "content": prompt},
+            ],
         )
         content = response.choices[0].message.content
-        
+
         return content.strip()
 
     except Exception as e:
@@ -106,56 +115,64 @@ Respond with only the match percentage as an integer.
 """
     return prompt.strip()
 
+
 # Function to get match percentage from OpenAI GPT-4
 def get_openai_match(prompt):
     try:
         response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a professional resume evaluator."},
-                {"role": "user", "content": prompt}
-            ]
+                {
+                    "role": "system",
+                    "content": "You are a professional resume evaluator.",
+                },
+                {"role": "user", "content": prompt},
+            ],
         )
         content = response.choices[0].message.content
-        digits = ''.join(filter(str.isdigit, content))
+        digits = "".join(filter(str.isdigit, content))
         return min(int(digits), 100) if digits else 0
     except Exception as e:
         st.error(f"OpenAI API Error: {e}")
         return 0
+
 
 # Function to get match percentage from Anthropic Claude
 def get_anthropic_match(prompt):
     try:
         model_name = "claude-3-7-sonnet-latest"
         claude = Anthropic()
-        
+
         message = claude.messages.create(
             model=model_name,
             max_tokens=100,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            messages=[{"role": "user", "content": prompt}],
         )
         content = message.content[0].text
-        digits = ''.join(filter(str.isdigit, content))
+        digits = "".join(filter(str.isdigit, content))
         return min(int(digits), 100) if digits else 0
     except Exception as e:
         st.error(f"Anthropic API Error: {e}")
         return 0
 
+
 # Function to get match percentage from Google Gemini
 def get_google_match(prompt):
     try:
-        gemini = OpenAI(api_key=google_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+        gemini = OpenAI(
+            api_key=google_api_key,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        )
         model_name = "gemini-2.0-flash"
         messages = [{"role": "user", "content": prompt}]
         response = gemini.chat.completions.create(model=model_name, messages=messages)
         content = response.choices[0].message.content
-        digits = ''.join(filter(str.isdigit, content))
+        digits = "".join(filter(str.isdigit, content))
         return min(int(digits), 100) if digits else 0
     except Exception as e:
         st.error(f"Google Gemini API Error: {e}")
         return 0
+
 
 # Function to get match percentage from Groq
 def get_groq_match(prompt):
@@ -165,25 +182,29 @@ def get_groq_match(prompt):
         messages = [{"role": "user", "content": prompt}]
         response = groq.chat.completions.create(model=model_name, messages=messages)
         answer = response.choices[0].message.content
-        digits = ''.join(filter(str.isdigit, answer))
+        digits = "".join(filter(str.isdigit, answer))
         return min(int(digits), 100) if digits else 0
     except Exception as e:
         st.error(f"Groq API Error: {e}")
         return 0
 
+
 # Function to get match percentage from DeepSeek
 def get_deepseek_match(prompt):
     try:
-        deepseek = OpenAI(api_key=deepseek_api_key, base_url="https://api.deepseek.com/v1")
+        deepseek = OpenAI(
+            api_key=deepseek_api_key, base_url="https://api.deepseek.com/v1"
+        )
         model_name = "deepseek-chat"
         messages = [{"role": "user", "content": prompt}]
         response = deepseek.chat.completions.create(model=model_name, messages=messages)
         answer = response.choices[0].message.content
-        digits = ''.join(filter(str.isdigit, answer))
+        digits = "".join(filter(str.isdigit, answer))
         return min(int(digits), 100) if digits else 0
     except Exception as e:
         st.error(f"DeepSeek API Error: {e}")
         return 0
+
 
 # Main action
 if st.button("🔍 Analyze Resume Fit"):
@@ -193,13 +214,13 @@ if st.button("🔍 Analyze Resume Fit"):
             # jd_text = extract_text(jd_file)
             os.makedirs("temp_files", exist_ok=True)
             resume_path = os.path.join("temp_files", resume_file.name)
-    
+
             with open(resume_path, "wb") as f:
                 f.write(resume_file.getbuffer())
             resume_docs = load_and_split_resume(resume_path)
             resume_text = "\n".join([doc.page_content for doc in resume_docs])
 
-            jd_path = os.path.join("temp_files", jd_file.name)  
+            jd_path = os.path.join("temp_files", jd_file.name)
             with open(jd_path, "wb") as f:
                 f.write(jd_file.getbuffer())
             jd_docs = load_and_split_resume(jd_path)

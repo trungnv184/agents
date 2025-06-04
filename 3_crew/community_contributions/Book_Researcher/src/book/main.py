@@ -2,7 +2,8 @@ import os
 from book.crew import BookResearchCrew
 
 # Ensure output directory exists
-os.makedirs('output', exist_ok=True)
+os.makedirs("output", exist_ok=True)
+
 
 def run():
     """
@@ -10,7 +11,7 @@ def run():
     """
     inputs = {
         # Example input for genre-based research
-        'genre': 'Fantasy'
+        "genre": "Fantasy"
     }
 
     # Kickoff the crew with inputs
@@ -25,5 +26,6 @@ def run():
     print(" - top_novelists.md")
     print(" - genre_research.md")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run()

@@ -26,19 +26,19 @@ manager_agent = Agent(
     tools=[
         clarifier_agent.as_tool(
             tool_name="clarifier",
-            tool_description="Generate 3 clarifying questions for the query"
+            tool_description="Generate 3 clarifying questions for the query",
         ),
         planner_agent.as_tool(
             tool_name="planner",
-            tool_description="Create a focused search plan given query and clarifications"
+            tool_description="Create a focused search plan given query and clarifications",
         ),
         search_agent.as_tool(
             tool_name="search",
-            tool_description="Summarize web search results for a given term"
+            tool_description="Summarize web search results for a given term",
         ),
         writer_agent.as_tool(
             tool_name="writer",
-            tool_description="Produce a cohesive markdown report from search summaries"
+            tool_description="Produce a cohesive markdown report from search summaries",
         ),
         send_email,  # function tool for sending the report via email
     ],

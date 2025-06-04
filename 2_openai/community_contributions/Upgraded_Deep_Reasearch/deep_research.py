@@ -7,10 +7,11 @@ from clarifier_agent import clarifier_agent
 from planner_agent import planner_agent
 from search_agent import search_agent
 from writer_agent import writer_agent
-from email_agent import email_agent   # ← import the Agent here
+from email_agent import email_agent  # ← import the Agent here
 
 # Load environment variables (e.g., SENDGRID_API_KEY)
 load_dotenv(override=True)
+
 
 async def run(query: str, answers: str, state: list[str]):
     """
@@ -22,13 +23,13 @@ async def run(query: str, answers: str, state: list[str]):
     if not state:
         clar = await Runner.run(clarifier_agent, query)
         questions = clar.final_output.questions
-        qtext = "\n".join(f"{i+1}. {q}" for i, q in enumerate(questions))
+        qtext = "\n".join(f"{i + 1}. {q}" for i, q in enumerate(questions))
         return qtext, gr.update(visible=True), questions
 
     # Phase 2: Full pipeline
     # 1) Bundle user answers for planner
     answered = [
-        f"{i+1}. {state[i]} answered: {ans.strip()}"
+        f"{i + 1}. {state[i]} answered: {ans.strip()}"
         for i, ans in enumerate(answers.splitlines())
     ]
     planner_input = f"Original query: {query}\nClarifications:\n" + "\n".join(answered)
@@ -56,6 +57,7 @@ async def run(query: str, answers: str, state: list[str]):
     # Return the markdown report and hide the answers box
     return report_md, gr.update(visible=False), []
 
+
 # Gradio UI
 with gr.Blocks(theme=gr.themes.Default(primary_hue="sky")) as ui:
     gr.Markdown("# Deep Research")
@@ -64,7 +66,7 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="sky")) as ui:
         label="Answer clarifying questions (one per line)",
         visible=False,
         lines=3,
-        placeholder="1. …\n2. …\n3. …"
+        placeholder="1. …\n2. …\n3. …",
     )
     state = gr.State([])
     report = gr.Markdown(label="Output")
@@ -73,7 +75,7 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="sky")) as ui:
     run_button.click(
         fn=run,
         inputs=[query_textbox, answers_box, state],
-        outputs=[report, answers_box, state]
+        outputs=[report, answers_box, state],
     )
 
 ui.launch(share=False)

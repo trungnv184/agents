@@ -57,12 +57,12 @@ You focus your trading on crypto ETFs.
 """
 
 
-
 def reset_traders():
     Account.get("Warren").reset(waren_strategy)
     Account.get("George").reset(george_strategy)
     Account.get("Ray").reset(ray_strategy)
     Account.get("Cathie").reset(cathie_strategy)
+
 
 if __name__ == "__main__":
     reset_traders()

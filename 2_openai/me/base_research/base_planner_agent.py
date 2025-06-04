@@ -1,15 +1,15 @@
 from pydantic import BaseModel, Field
 from agents import Agent
+import os
 
-HOW_MANY_SEARCHES = 5
 
 INSTRUCTIONS = (
-    f"You are a helpful research assistant. Given a query, come up with a set of web searches \
-to perform to best answer the query. Output {HOW_MANY_SEARCHES} terms to query for."
+    f"You are a helpful research assistant. Given a query, come up with a set of web searches "
+    f"to perform to best answer the query. Output {os.environ.get('HOW_MANY_SEARCHES', 5)} terms to query for."
 )
 
 
-class WebSearchItem(BaseModel):
+class WebSearchPlanItem(BaseModel):
     reason: str = Field(
         description="Your reasoning for why this search is important to the query."
     )
@@ -17,7 +17,7 @@ class WebSearchItem(BaseModel):
 
 
 class WebSearchPlan(BaseModel):
-    searches: list[WebSearchItem] = Field(
+    searches: list[WebSearchPlanItem] = Field(
         description="A list of web searches to perform to best answer the query."
     )
 
