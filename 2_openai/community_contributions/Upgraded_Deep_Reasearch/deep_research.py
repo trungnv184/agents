@@ -24,7 +24,8 @@ async def run(query: str, answers: str, state: list[str]):
         clar = await Runner.run(clarifier_agent, query)
         questions = clar.final_output.questions
         qtext = "\n".join(f"{i + 1}. {q}" for i, q in enumerate(questions))
-        return qtext, gr.update(visible=True), questions
+        # Show answers box but keep feedback box hidden
+        return qtext, gr.update(visible=True), gr.update(visible=False), questions
 
     # Phase 2: Full pipeline
     # 1) Bundle user answers for planner
@@ -51,23 +52,34 @@ async def run(query: str, answers: str, state: list[str]):
     report_md = report_data.markdown_report
 
     # 5) Email the report
-    # Pass the markdown report as the “detailed report” prompt to the email agent
+    # Pass the markdown report as the "detailed report" prompt to the email agent
     await Runner.run(email_agent, report_md)
 
-    # Return the markdown report and hide the answers box
-    return report_md, gr.update(visible=False), []
+    # Show feedback box and hide answers box when complete
+    return report_md, gr.update(visible=False), gr.update(visible=True), []
 
 
 # Gradio UI
 with gr.Blocks(theme=gr.themes.Default(primary_hue="sky")) as ui:
     gr.Markdown("# Deep Research")
     query_textbox = gr.Textbox(label="What topic would you like to research?")
+    
+    # First component - answers box (initially hidden)
     answers_box = gr.Textbox(
         label="Answer clarifying questions (one per line)",
         visible=False,
         lines=3,
         placeholder="1. …\n2. …\n3. …",
     )
+    
+    # Second component - feedback box (initially hidden)
+    feedback_box = gr.Textbox(
+        label="Provide feedback on the research",
+        visible=False,
+        lines=2,
+        placeholder="Enter your feedback here..."
+    )
+    
     state = gr.State([])
     report = gr.Markdown(label="Output")
     run_button = gr.Button("Run")
@@ -75,7 +87,7 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="sky")) as ui:
     run_button.click(
         fn=run,
         inputs=[query_textbox, answers_box, state],
-        outputs=[report, answers_box, state],
+        outputs=[report, answers_box, feedback_box, state],  # Note: outputs match the return values in run()
     )
 
 ui.launch(share=False)

@@ -24,12 +24,25 @@ code_task:
 
 frontend_task:
   description: >
-    Write a gradio UI in a module app.py that demonstrates the given backend class in {module_name}.
-    Assume there is only 1 user, and keep the UI very simple indeed - just a prototype or demo.
+    Write a professional gradio UI in a module app.py that demonstrates the given backend class in {module_name}.
+    Create a beautiful, modern web interface that can be accessed from localhost with proper error handling and user feedback.
+    The UI should:
+    - Be accessible via localhost with proper server configuration
+    - Have a modern, professional design with good UX
+    - Include real-time updates and feedback
+    - Handle errors gracefully with user-friendly messages
+    - Show current portfolio status and transaction history
+    - Include input validation and confirmation dialogs
+    - Use proper layout with tabs or sections for different functions
     Here are the requirements: {requirements}
   expected_output: >
-    A gradio UI in module app.py that demonstrates the given backend class.
-    The file should be ready so that it can be run as-is, in the same directory as the backend module, and it should import the backend class from {module_name}.
+    A professional gradio UI in module app.py with:
+    - Modern layout and styling
+    - Localhost server configuration (host="0.0.0.0", server_port=7860, share=False)
+    - Real-time portfolio updates
+    - Error handling and user feedback
+    - Input validation
+    - Professional styling and layout
     IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
     The output should be valid Python code that can be directly saved to a file and executed.
   agent: frontend_engineer
@@ -48,3 +61,26 @@ test_task:
   context:
     - code_task
   output_file: output/test_{module_name}
+
+deployment_task:
+  description: >
+    Create a production-ready launch script that:
+    - Runs the {module_name} application on localhost
+    - Handles all dependencies and virtual environment setup
+    - Provides clear instructions for users
+    - Includes error handling and logging
+    - Configures the app to be accessible via http://localhost:7860
+    - Creates a README with setup and usage instructions
+    - Includes a requirements.txt file if needed
+  expected_output: >
+    A launch script (run_app.py or run_app.sh) and a README.md with:
+    - Step-by-step setup instructions
+    - How to access the application via localhost
+    - Troubleshooting guide
+    - Dependencies and requirements
+    IMPORTANT: Output ONLY the raw script/text content without any markdown formatting or code block delimiters.
+  agent: deployment_engineer
+  context:
+    - frontend_task
+    - code_task
+  output_file: output/README.md
